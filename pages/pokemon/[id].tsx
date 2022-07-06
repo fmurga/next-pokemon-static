@@ -1,9 +1,7 @@
-
 import { useState } from "react";
 
 import { GetStaticPaths, GetStaticProps, NextPage } from "next";
 import Image from "next/image";
-
 
 import { Button, Card, Container, Grid, Row, Text } from "@nextui-org/react";
 
@@ -17,9 +15,9 @@ interface Props {
 }
 
 const PokemonPage: NextPage<Props> = ({ pokemon }) => {
-
-  const [isInFavorites, setIsInFavorites] = useState(localfavorites.isInFavorites(pokemon.id))
-
+  const [isInFavorites, setIsInFavorites] = useState(
+    localfavorites.isInFavorites(pokemon.id)
+  );
 
   const onToggleFavorite = () => {
     localfavorites.toggleFavorite(pokemon.id);
@@ -34,11 +32,10 @@ const PokemonPage: NextPage<Props> = ({ pokemon }) => {
       angle: -100,
       origin: {
         x: 1,
-        y: 0
-      }
-    })
+        y: 0,
+      },
+    });
   };
-
 
   return (
     <Layout title="Algun Pokemon">
@@ -68,37 +65,44 @@ const PokemonPage: NextPage<Props> = ({ pokemon }) => {
               <Text h1 transform="capitalize">
                 {pokemon.name}
               </Text>
-              <Button color="gradient" ghost={!isInFavorites} onPress={onToggleFavorite}>
-                {isInFavorites ? 'En Favoritos' : 'Guardar en Favoritos'}
+              <Button
+                color="gradient"
+                ghost={!isInFavorites}
+                onPress={onToggleFavorite}>
+                {isInFavorites ? "En Favoritos" : "Guardar en Favoritos"}
               </Button>
             </Card.Header>
             <Card.Body>
               <Text size={30}>Sprites:</Text>
-              <Container  display="flex" direction="row" justify="space-between" gap={0}>
-                  <Image
-                    src={pokemon.sprites.front_default}
-                    alt={pokemon.name}
-                    width={100}
-                    height={100}
-                  />
-                  <Image
-                    src={pokemon.sprites.back_default}
-                    alt={pokemon.name}
-                    width={100}
-                    height={100}
-                  />
-                  <Image
-                    src={pokemon.sprites.front_shiny}
-                    alt={pokemon.name}
-                    width={100}
-                    height={100}
-                  />
-                  <Image
-                    src={pokemon.sprites.back_shiny}
-                    alt={pokemon.name}
-                    width={100}
-                    height={100}
-                  />
+              <Container
+                display="flex"
+                direction="row"
+                justify="space-between"
+                gap={0}>
+                <Image
+                  src={pokemon.sprites.front_default}
+                  alt={pokemon.name}
+                  width={100}
+                  height={100}
+                />
+                <Image
+                  src={pokemon.sprites.back_default}
+                  alt={pokemon.name}
+                  width={100}
+                  height={100}
+                />
+                <Image
+                  src={pokemon.sprites.front_shiny}
+                  alt={pokemon.name}
+                  width={100}
+                  height={100}
+                />
+                <Image
+                  src={pokemon.sprites.back_shiny}
+                  alt={pokemon.name}
+                  width={100}
+                  height={100}
+                />
               </Container>
             </Card.Body>
           </Card>
@@ -119,16 +123,28 @@ export const getStaticPaths: GetStaticPaths = async (ctx) => {
     paths: pokemons.map((id) => ({
       params: { id },
     })),
-    fallback: false,
+    fallback: 'blocking',
   };
 };
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
   const { id } = params as { id: string };
 
+  const pokemon = await getPokemonData(id);
+
+  if (!pokemon) {
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false
+      }
+    }
+  }
+
   return {
     props: {
-      pokemon: await getPokemonData(id),
+      pokemon,
     },
+    revalidate: 86400,
   };
 };
