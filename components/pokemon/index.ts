@@ -1,0 +1,6 @@
+export * from "./PokemonList";
+export * from "./PokemonCard";
+export * from "./FavoritePokemonCard";
+export * from "./FavoritePokemons"
+
+
